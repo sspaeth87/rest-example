@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xml>
+<?xdevuiml version="1.0"?>
+<?template NONE?>
+<?import com.vaadin.flow.component.button.Button?>
+<?import com.vaadin.flow.component.grid.Grid?>
+<?import com.vaadin.flow.component.orderedlayout.HorizontalLayout?>
+<?import com.vaadin.flow.component.orderedlayout.VerticalLayout?>
+<?import com.vaadin.flow.component.textfield.TextField?>
+<?import de.xdevsoftware.restexample.domain.Customer?>
+<VerticalLayout xmlns:x="http://xml.xdev-software.com/xdevuiml" x:name="MainLayout" x:route="">
+    <x:constraints zpos="0" width="100%" height="100%" />
+    <HorizontalLayout x:name="horizontalLayout">
+        <x:constraints width="100%" height="-1px" flex-grow="0.0" />
+        <Button x:name="button" text="Find all customers">
+            <x:constraints width="0px" height="0px" flex-grow="0.0" />
+            <x:event>click.onComponentEvent</x:event>
+        </Button>
+        <Button x:name="button2" text="Find customer by id">
+            <x:constraints width="0px" height="0px" flex-grow="0.0" />
+            <x:event>click.onComponentEvent</x:event>
+        </Button>
+        <TextField x:name="txtCustomerId">
+            <x:constraints width="0px" height="0px" flex-grow="0.0" />
+        </TextField>
+    </HorizontalLayout>
+    <Grid x:name="grid">
+        <x:typeArguments>
+            <typeArgument type="Customer" />
+        </x:typeArguments>
+        <x:constraints width="100%" height="100%" flex-grow="1.0" />
+        <x:columns>
+            <column property="customerid" sortable="true" />
+            <column property="contacttitle" sortable="true" />
+            <column property="contactname" sortable="true" />
+            <column property="companyname" sortable="true" />
+            <column property="city" sortable="true" />
+            <column property="address" sortable="true" />
+            <column property="country" sortable="true" />
+        </x:columns>
+    </Grid>
+</VerticalLayout>
