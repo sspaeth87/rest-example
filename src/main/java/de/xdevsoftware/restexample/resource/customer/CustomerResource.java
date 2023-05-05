@@ -15,6 +15,8 @@ import com.rapidclipse.framework.server.Rap;
 
 import de.xdevsoftware.restexample.dal.CustomerDAO;
 import de.xdevsoftware.restexample.domain.Customer;
+import de.xdevsoftware.restexample.dto.CustomerDTO;
+import de.xdevsoftware.restexample.util.ItemMapper;
 
 
 // http://localhost:8080/RestExample/api/customer
@@ -28,7 +30,7 @@ public class CustomerResource
 			return new CustomerDAO().findAll();
 		});
 
-		return Response.ok(query.get()).build();
+		return Response.ok(ItemMapper.fromList(query.get(), CustomerDTO.class)).build();
 	}
 
 	@GET()
@@ -42,7 +44,7 @@ public class CustomerResource
 		final Customer customer = query.get();
 		if(customer != null)
 		{
-			return Response.ok(customer).build();
+			return Response.ok(ItemMapper.fromItem(customer, CustomerDTO.class)).build();
 		}
 
 		return Response.status(Status.NOT_FOUND).entity("No customer was found with the id: " + id).build();
