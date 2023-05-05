@@ -2,10 +2,14 @@
 package de.xdevsoftware.restexample.resource.customer;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -59,11 +63,22 @@ public class CustomerResource
 		// workaround to generate a id
 		final String uuid = UUID.randomUUID().toString();
 		customer.setCustomerid(uuid.substring(0, 5));
+		
+		final Validator                             validator =
+			Validation.buildDefaultValidatorFactory().getValidator();
+		final Set<ConstraintViolation<CustomerDTO>> validate  = validator.validate(customerDTO);
+		
+		if(validate.isEmpty())
+		{
+			final Future<Customer> submit = Rap.getExecutorService().submit(() -> {
+				return new CustomerDAO().save(customer);
+			});
 
-		final Future<Customer> submit = Rap.getExecutorService().submit(() -> {
-			return new CustomerDAO().save(customer);
-		});
+			return Response.status(Status.CREATED).entity(submit.get()).build();
+		}
 
-		return Response.status(Status.CREATED).entity(submit.get()).build();
+		validate.forEach(error -> System.out.println(error.getMessage()));
+
+		return Response.status(Status.BAD_REQUEST).build();
 	}
 }
