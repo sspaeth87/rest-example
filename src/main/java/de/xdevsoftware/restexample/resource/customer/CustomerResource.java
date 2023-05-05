@@ -2,10 +2,12 @@
 package de.xdevsoftware.restexample.resource.customer;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
@@ -29,10 +31,10 @@ public class CustomerResource
 		final Future<List<Customer>> query = Rap.getExecutorService().submit(() -> {
 			return new CustomerDAO().findAll();
 		});
-
+		
 		return Response.ok(ItemMapper.fromList(query.get(), CustomerDTO.class)).build();
 	}
-
+	
 	@GET()
 	@Path("{id}")
 	public Response find(@PathParam("id") final String id) throws InterruptedException, ExecutionException
@@ -40,14 +42,28 @@ public class CustomerResource
 		final Future<Customer> query = Rap.getExecutorService().submit(() -> {
 			return new CustomerDAO().find(id);
 		});
-		
+
 		final Customer customer = query.get();
 		if(customer != null)
 		{
 			return Response.ok(ItemMapper.fromItem(customer, CustomerDTO.class)).build();
 		}
-
+		
 		return Response.status(Status.NOT_FOUND).entity("No customer was found with the id: " + id).build();
 	}
-	
+
+	@POST
+	public Response create(final CustomerDTO customerDTO) throws InterruptedException, ExecutionException
+	{
+		final Customer customer = ItemMapper.fromItem(customerDTO, Customer.class);
+		// workaround to generate a id
+		final String uuid = UUID.randomUUID().toString();
+		customer.setCustomerid(uuid.substring(0, 5));
+
+		final Future<Customer> submit = Rap.getExecutorService().submit(() -> {
+			return new CustomerDAO().save(customer);
+		});
+
+		return Response.status(Status.CREATED).entity(submit.get()).build();
+	}
 }
